@@ -268,3 +268,21 @@ def apply_and_notify(base_value, event, action, inputs, fields, msg, slack_clien
                        before_notify, partial_notify, after_notify])
 
     return pipe(base_value, actions)
+
+
+def apply_and_notify_test(base_value, event, action, inputs, fields, msg, slack_client,
+                     before_narrower=[], before_formatter=[], before_notify=[], after_notify=[]):  # hooks
+    partial_narrower = wrapped_partial(narrower,
+                                       fields=fields)
+    partial_formatter = wrapped_partial(formatter, msg)
+    partial_notify = wrapped_partial(notify_slack,
+                                     slack_client,
+                                     settings.NOTIFICATIONS_SLACK_CHANNEL,
+                                     event)
+
+    actions = flatten([partial_action,
+                       before_narrower, partial_narrower,
+                       before_formatter, partial_formatter,
+                       before_notify, partial_notify, after_notify])
+
+    return pipe(base_value, actions)
